@@ -1,4 +1,4 @@
-describe('Teste de Produtos - Frontend (BDD sem DDT)', () => {
+describe('Teste de Produtos - Frontend', () => {
 
   const url = 'https://www.saucedemo.com/'
   const usernameInput = 'input[name="user-name"]'

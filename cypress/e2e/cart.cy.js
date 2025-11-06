@@ -1,39 +1,52 @@
-Cypress.Commands.add('login', (username, password) => {
-    cy.visit('https://www.saucedemo.com/');
-    cy.get('[data-test="username"]').type(username);
-    cy.get('[data-test="password"]').type(password);
-    cy.get('[data-test="login-button"]').click();
-});
+describe('Teste de Carrinho - Frontend', () => {
 
-describe('Funcionalidade: Carrinho', () => {
-    const user = 'standard_user';
-    const pass = 'secret_sauce';
+  const url = 'https://www.saucedemo.com/'
+  const usernameInput = 'input[name="user-name"]'
+  const passwordInput = 'input[name="password"]'
+  const submitButton = 'input[type="submit"]'
 
-    beforeEach(() => {
-        cy.login(user, pass);
-    });
+  const cartBadge = '.shopping_cart_badge'
+  const cartLink = '.shopping_cart_link'
+  const cartItem = '.cart_item'
 
-    it('Adicionar 1 produto ao carrinho', () => {
-        cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-        cy.get('.shopping_cart_badge').should('have.text', '1');
-    });
+  const addBackpackBtn = '[data-test="add-to-cart-sauce-labs-backpack"]'
+  const removeBackpackBtn = '[data-test="remove-sauce-labs-backpack"]'
+  const addBikeLightBtn = '[data-test="add-to-cart-sauce-labs-bike-light"]'
 
-    it('Adicionar 2 produtos ao carrinho', () => {
-        cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-        cy.get('[data-test="add-to-cart-sauce-labs-bike-light"]').click();
-        cy.get('.shopping_cart_badge').should('have.text', '2');
-    });
+  const validUser = { username: 'standard_user', password: 'secret_sauce' }
 
-    it('Remover produto do carrinho', () => {
-        cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-        cy.get('[data-test="remove-sauce-labs-backpack"]').click();
-        cy.get('.shopping_cart_badge').should('not.exist');
-    });
+  beforeEach(() => {
+    cy.visit(url)
+    cy.get(usernameInput).type(validUser.username)
+    cy.get(passwordInput).type(validUser.password)
+    cy.get(submitButton).click()
+    cy.url().should('include', '/inventory.html')
+  })
 
-    it('Visualizar carrinho', () => {
-        cy.get('[data-test="add-to-cart-sauce-labs-backpack"]').click();
-        cy.get('.shopping_cart_link').click();
-        cy.url().should('include', '/cart.html');
-        cy.get('.cart_item').should('have.length', 1);
-    });
-});
+  it('Dado que estou logado, Quando adiciono 1 produto ao carrinho, Então o carrinho deve exibir a quantidade 1', () => {
+    cy.get(addBackpackBtn).click()
+    cy.get(cartBadge).should('have.text', '1')
+  })
+
+  it('Dado que estou logado, Quando adiciono 2 produtos ao carrinho, Então o carrinho deve exibir a quantidade 2', () => {
+    cy.get(addBackpackBtn).click()
+    cy.get(addBikeLightBtn).click()
+    cy.get(cartBadge).should('have.text', '2')
+  })
+
+   it('Dado que estou logado, Quando adiciono um produto e depois removo, Então o carrinho deve ficar vazio', () => {
+    cy.get(addBackpackBtn).click()
+    cy.get(cartBadge).should('have.text', '1')
+    cy.get(removeBackpackBtn).click()
+    cy.get(cartBadge).should('not.exist')
+})
+
+
+  it('Dado que tenho um produto no carrinho, Quando acesso o carrinho, Então devo visualizar o produto adicionado', () => {
+    cy.get(addBackpackBtn).click()
+    cy.get(cartLink).click()
+    cy.url().should('include', '/cart.html')
+    cy.get(cartItem).should('have.length', 1)
+  })
+
+})
